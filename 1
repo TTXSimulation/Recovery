@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Inject 1 – Backup Validierung</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; background: #1a1a1a; color: #eee; padding: 2rem; }
+    h1, h2 { color: #fff; }
+    .section { background: #2b2b2b; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+    .status-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .status-table th, .status-table td { border: 1px solid #444; padding: 8px; text-align: left; }
+    .status-table th { background-color: #333; color: #fff; }
+    .ok { color: #4CAF50; }
+    .fail { color: #f44336; }
+    .warn { color: #ff9800; }
+    .info { color: #2196F3; }
+    button { margin-top: 1rem; padding: 0.5rem 1rem; font-size: 1rem; background: #333; color: #fff; border: 1px solid #555; border-radius: 5px; }
+    .decision-btns button { margin-right: 1rem; margin-top: 0.5rem; }
+    textarea { width: 100%; height: 120px; margin-top: 1rem; padding: 0.5rem; font-size: 1rem; background: #1e1e1e; color: #fff; border: 1px solid #555; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>🧨 Inject 1 – Backup-Validierung nach ALPHV-Ransomware</h1>
+
+  <div class="section">
+    <h2>📊 Technisches Lagebild (SIEM-Ansicht)</h2>
+    <table class="status-table">
+      <tr><th>Zeitstempel</th><th>Quelle</th><th>Meldung</th></tr>
+      <tr><td>04:28</td><td>Auth-Log</td><td class="warn">⚠️ Fehlgeschlagene RDP-Anmeldung auf SPBERRZWBCK01 von interner IP 10.1.25.77</td></tr>
+      <tr><td>04:30</td><td>PRTG-Monitor</td><td class="fail">❗ SPBERRZWBCK01: Disk-Warnung, Ping-Loss, Veeam Service Down</td></tr>
+      <tr><td>04:31</td><td>Veeam-Log</td><td class="fail">❌ Letzter geplanter Job auf SPBERRZWBCK01 schlug fehl (Job: Daily-FS-Job)</td></tr>
+      <tr><td>04:32</td><td>Netzwerk-Log</td><td class="fail">🔒 Verschlüsselungsaktivität erkannt auf VM-SQL01, VM-FS01, VM-APP01</td></tr>
+      <tr><td>04:32</td><td>IDS</td><td class="fail">🚨 Traffic mit bekannten AlphV-Signaturen entdeckt (Ziel: ext. IP 185.44.99.27)</td></tr>
+      <tr><td>04:33</td><td>FileAudit</td><td class="fail">📄 ALPHV-LEAK.txt entdeckt auf \\fs01\shares\reports</td></tr>
+      <tr><td>04:34</td><td>AV-Agent (EOL)</td><td class="warn">⚠️ Echtzeitschutz auf VM-FS01 veraltet – Signaturstand 01.04.2025</td></tr>
+      <tr><td>04:35</td><td>NAS</td><td class="ok">✅ Letzte Sicherung am 11.06. – 23:45 erfolgreich abgeschlossen</td></tr>
+      <tr><td>04:36</td><td>SSH-Agent</td><td class="ok">✅ Zugriff auf SPBERRZWBCK02 erfolgreich – kein Verschlüsselungshinweis</td></tr>
+      <tr><td>04:36</td><td>Veeam-Log</td><td class="ok">✅ Health-Check Repo02: keine Fehler, Kettenkonsistenz OK</td></tr>
+      <tr><td>04:37</td><td>Tape-GUI</td><td class="fail">❌ Fehler beim Laden von https://sdberrzwtad01 – VLAN2352 down</td></tr>
+      <tr><td>04:38</td><td>File-Inventory</td><td class="ok">✅ *.vbk / *.vib / *.vbm gefunden auf NAS-Pfad /mnt/nas/backups/2025-06-11/</td></tr>
+      <tr><td>04:39</td><td>Monitoring</td><td class="ok">✅ VM-FS02, VM-SEC01, VM-MGMT01 ohne Auffälligkeiten</td></tr>
+      <tr><td>04:40</td><td>RHEL-Agent</td><td class="warn">🔐 Root-Zugriffsversuch auf SPBERRZWBCK02 geblockt durch MFA</td></tr>
+      <tr><td>04:41</td><td>GxP-Monitor</td><td class="ok">✅ Letzte validierte Sicherung der Applikationsdatenbank vorhanden (GxP-relevant)</td></tr>
+      <tr><td>04:42</td><td>DLP-System</td><td class="warn">⚠️ Verdächtiger Upload-Versuch von report-export.xlsx nach files.io erkannt</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>📝 Einschätzung eintragen</h2>
+    <p>Basierend auf dem Lagebild: Wie ist Ihre erste Einschätzung zur Situation?</p>
+    <textarea placeholder="Notizen zur Backup-Situation, Verdachtsmomenten, Handlungsprioritäten..."></textarea>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Nächster Schritt – Entscheidung treffen</h2>
+    <p>Was möchten Sie als Nächstes tun?</p>
+    <div class="decision-btns">
+      <button onclick="alert('Modul Zugriff auf Backup-Repository öffnet sich...')">🔐 Zugriff auf Backup-Repository prüfen</button>
+      <button onclick="alert('Modul NAS-Backupprüfung öffnet sich...')">🗂️ NAS Backupprüfung</button>
+      <button onclick="alert('Modul Health-Check öffnet sich...')">🔁 Health-Check starten</button>
+      <button onclick="alert('Modul Test Restore öffnet sich...')">🔄 Test Restore durchführen</button>
+      <button onclick="alert('Modul Bandlaufwerkstatus öffnet sich...')">💾 Bandlaufwerkstatus prüfen</button>
+    </div>
+  </div>
+
+</body>
+</html>
